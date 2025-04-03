@@ -76,5 +76,5 @@ def display_ascii_art(ascii_matrix):
         print("".join(row))
 
 
-best_ascii = genetic_algorithm('blacksquare.jpg', size=32, generations=500)
+best_ascii = genetic_algorithm('blacksquare.jpg', size=32, generations=10000)
 display_ascii_art(best_ascii)
