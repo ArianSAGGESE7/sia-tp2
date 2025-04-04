@@ -10,6 +10,7 @@ def _cruce_un_punto(c1, c2, **kwargs):
     c3 = np.hstack((c1[:i], c2[i:]))
     return c3
 
+
 def _cruce_n_puntos(c1, c2, n=2, **kwargs):
     i = 1
     for _ in range(n):
@@ -24,11 +25,21 @@ def _cruce_uniforme(c1, c2, **kwargs):
     return c3
 
 
+def _cruce_anular(c1, c2, **kwargs):
+    p = np.random.randint(0, len(c1))
+    l = np.random.randint(1, len(c1)//2)
+    swap_index = [(p+i) % len(c1) for i in range(l)]
+    c3 = c1.copy()
+    for index in swap_index:
+        c3[index] = c2[index]
+    return c3
+
+
 funcion_cruza = {
     "cruce_un_punto": _cruce_un_punto,
     "cruce_n_puntos": _cruce_n_puntos,
     "cruce_uniforme": _cruce_uniforme,
-
+    "cruce_anular": _cruce_anular,
 }
 
 def cruzar(ind1, ind2, metodo="cruce_un_punto", **kwargs):

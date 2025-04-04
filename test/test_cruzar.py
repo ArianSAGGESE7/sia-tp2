@@ -23,3 +23,5 @@ def test_cruce():
     ind3 = cruzar(ind1, ind2, "cruce_n_puntos", n=2)
     assert ind3.cromosoma.shape == ind1.cromosoma.shape
 
+    ind3 = cruzar(ind1, ind2, "cruce_anular")
+    assert ind3.cromosoma.shape == ind1.cromosoma.shape
