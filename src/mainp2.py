@@ -99,7 +99,7 @@ def genetic_algorithm(M,N,img_size,img_ref,Generations):
         
         # Mutamos
         for i in range(M):
-            new_population[i] = mutate(new_population[i], mutation_rate=0.1)
+            new_population[i] = mutate(new_population[i], mutation_rate=0.1, img_size=img_size)
         
         fitness_vec=[]
         population = new_population;
@@ -108,7 +108,7 @@ def genetic_algorithm(M,N,img_size,img_ref,Generations):
             img = draw_population(population,m);
             fitness_vec.append(fitness(img_ref, img))
         
-        print("Puntaje fitness mìnimo:{}".format(min(fitness_vec)))
+        print("Puntaje fitness mìnimo:\t{}".format(min(fitness_vec)))
     return seleccion_elite(population, fitness_vec, 1)
 
 def seleccion_elite(poblacion, fitness_values, num_elites):
@@ -137,7 +137,7 @@ def crossover(parent1, parent2,P):
 
     return child1, child2
 
-def mutate(individual, mutation_rate=0.1):
+def mutate(individual, mutation_rate=0.1, img_size=(256, 256)):
     """ Aplica mutación a un individuo modificando sus triángulos """
     for i in range(len(individual)):
         if np.random.rand() < mutation_rate:
@@ -146,14 +146,14 @@ def mutate(individual, mutation_rate=0.1):
 
 
 
-
-M = 9   # Número de individuos
-N = 40  # Triángulos por individuo
-img_size = (256, 256)  # Tamaño de la imagen
-img_ref = Image.open("blacksquare.jpg").convert("RGBA")
-img_ref = img_ref.resize(img_size)
-Generations = 10000;
-individual = genetic_algorithm(M,N,img_size,img_ref,Generations)
-img1 = draw_population(individual,0)
-img1.show()
+if __name__ == "__main__":
+    M = 9   # Número de individuos
+    N = 40  # Triángulos por individuo
+    img_size = (256, 256)  # Tamaño de la imagen
+    img_ref = Image.open("src/blacksquare.jpg").convert("RGBA")
+    img_ref = img_ref.resize(img_size)
+    Generations = 100;
+    individual = genetic_algorithm(M,N,img_size,img_ref,Generations)
+    img1 = draw_population(individual,0)
+    img1.show()
 
