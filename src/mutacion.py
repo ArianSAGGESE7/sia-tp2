@@ -20,7 +20,7 @@ def mutar(ind, prob_mutacion, cant_mutacion):
             # x11 y11 x12 y12   R   G   B   A
             # x21 y21 x22 y22   R   G   B   A
             
-            if j < m - 4: # cambia coordenada
+            if j < (n - 4): # cambia coordenada
                 if i % 2 == 0: # numero par - coordenada x
                     mut = np.random.randint(ind.img_dims[1])
                 else: # numero impar - coordenada y
