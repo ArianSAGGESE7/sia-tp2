@@ -56,11 +56,12 @@ def crear_imagen(individuo: Individuo):
         poligono = poligonos[i]
         color = colores[i].tolist()
         img = cv2.fillPoly(img, [poligono], color)
-    return img
+    return img.astype(np.uint8)
 
 
 def calcular_costo(img1, img2):
     """Calcula el Error Cuadrático Medio (MSE) entre dos imágenes"""
     """Lo usamos como función de fitness"""    
+    # Ver de comparar forma por un lado y color por el otro
     return (np.abs(img1 - img2)).mean(axis=None)
     
