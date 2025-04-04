@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 import numpy as np
 from PIL import Image, ImageDraw
 import random
+import cv2
 
 # Tamaño del lienzo
 WIDTH, HEIGHT = 256, 256  
@@ -17,46 +19,56 @@ def fitness(img1, img2):
     return mse
 
 
-def draw_population(individuos,M):
-    "Dibuja M individuos en una dada imagen"
+def draw(individuo):
+    "Crea una imagen con el cromosoma de un individuo"
+    colores = individuo.cromosoma[:,-4:]                    # Las 4 ultimas columnas son canales RGBA
+    shape = (individuo.n_poligonos, individuo.n_lados, 2)   # De un array flatten a [[p1, p2, p3], [p1, p2, p3] ...]
+    poligonos = individuo.cromosoma[:,:-4].reshape(shape)
     
-    individuo = individuos[M]
-    imagen_gen= Image.new("RGBA", (256, 256), (255, 255, 255, 255))  # Lienzo blanco
-    draw = ImageDraw.Draw(imagen_gen, "RGBA")  # Permite transparencia
-
-    for triangulo in range(len(individuo)):
-        triangulo_color = individuo[triangulo]
-        triangulo = tuple((triangulo_color[:3]))
-        color = triangulo_color[3]
-        draw.polygon(triangulo, fill=color) 
-             
-        # imagen_gen.show()
-    
-    return imagen_gen
-
-def generate_population(M, N, img_size):
-    """Genera una población de M individuos con N triángulos cada uno"""
-    width, height = img_size
-    poblacion = []
-    
-    for _ in range(M):  # Para cada individuo
-        individuo = []
-        for _ in range(N):  # Para cada triángulo
-            triangulo = [
-                (random.randint(0, width), random.randint(0, height)),  # Punto 1
-                (random.randint(0, width), random.randint(0, height)),  # Punto 2
-                (random.randint(0, width), random.randint(0, height)),  # Punto 3
-                (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(50, 200))  # Color RGBA
-            ]
-            individuo.append(triangulo)
-        poblacion.append(individuo)  # Guardar individuo en la población
-    
-    return np.array(poblacion, dtype=object)  # Convertir a arreglo numpy
+    img = np.zeros(individuo.img_dims)                      # Lienzo vacio
+    for i in range(poligonos.shape[0]):                     # Armo matriz con triangulos dentro
+        poligono = poligonos[i]
+        color = colores[i].tolist()
+        img = cv2.fillPoly(img, [poligono], color)
+    return img
 
 
+@dataclass
+class Individuo:
+    cromosoma: np.array     # encoding [x1, y1, ... xn, yn, R, G, B, A]
+    costo: float            # comparativa con imagen original
+    img_dims: tuple         # dimensiones imagen de referencia
+    n_poligonos: int        # numero de poligonos
+    n_lados: int            # numero de lados
 
-# Generar población
-# poblacion = generate_population(M, N, img_size)
+
+def poligono_aleatorio(img, lados=3):
+    "genera vector de la forma [x1, y1, x2, y2, ... xi, yi, cR, cG, cB, cA]"
+    l, w, num_color = img.shape
+    puntos = []
+    color = np.random.randint(0, 256, num_color)
+    x = np.random.randint(0, w+1, lados)
+    y = np.random.randint(0, l+1, lados)
+    puntos = np.vstack((x, y)).T.reshape(-1)
+    return np.hstack((puntos, color))
+
+
+def crear_individuo(img, num_poligonos, num_lados):
+    "genera un individuo de la poblacion"
+    ind = Individuo(
+        cromosoma=np.vstack([poligono_aleatorio(img, num_lados) for i in range(num_poligonos)]),
+        costo=0,
+        img_dims=img.shape,
+        n_poligonos=num_poligonos,
+        n_lados=num_lados
+    )
+    return ind
+
+
+def generate_population(img, M, N):
+    "Genera una población de M individuos con N triángulos cada uno"
+    return [crear_individuo(img, N, 3) for _ in range(M)]    
+
 
 # img1 = draw_population(poblacion,1);
 # img2 = draw_population(poblacion,2);
@@ -72,14 +84,15 @@ def genetic_algorithm(M,N,img_size,img_ref,Generations):
        img_ref es la imagen de referencia
        K es la cantidad de generaciones (podría haber otro indicio de parada)"""
        
-    population_0 = generate_population(M,N,img_size)
+    population_0 = generate_population(img, M, N)
     population = population_0; 
     for gen in range(Generations):
         
         # Obtengo las imagenes de cada una de las representaciones 
+        # TODO Esto se podria paralelizar para mayor rapidez
         fitness_gen = []
         for m in range(M):
-            img = draw_population(population,m);
+            img = draw(population,m)
             fitness_gen.append(fitness(img_ref, img))
         new_population = []
         
@@ -135,18 +148,16 @@ def crossover(parent1, parent2,P):
     child1 = np.hstack((parent1[:,:P], parent2[:,P:len(parent1[1])]))
     child2 = np.hstack((parent2[:,:P], parent1[:,P:len(parent1[1])]))
 
-    return child1, child2
-
-def mutate(individual, mutation_rate=0.1, img_size=(256, 256)):
-    """ Aplica mutación a un individuo modificando sus triángulos """
-    for i in range(len(individual)):
-        if np.random.rand() < mutation_rate:
-            individual[i] = generate_population(1, 1, img_size) # Genera un nuevo triángulo
-    return individual
+        
+    print("Puntaje fitness mìnimo:\t{}".format(mejor.costo))
+    
 
 
 
 if __name__ == "__main__":
+    # Generalmente se pone __name__ == "__main__" para evitar
+    # que al importar este archivo se corra las lineas debajo.
+    # Si se ejecuta solo el archivo si las corre.
     M = 9   # Número de individuos
     N = 40  # Triángulos por individuo
     img_size = (256, 256)  # Tamaño de la imagen
@@ -154,6 +165,6 @@ if __name__ == "__main__":
     img_ref = img_ref.resize(img_size)
     Generations = 100;
     individual = genetic_algorithm(M,N,img_size,img_ref,Generations)
-    img1 = draw_population(individual,0)
+    img1 = draw(individual,0)
     img1.show()
 
