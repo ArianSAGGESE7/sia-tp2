@@ -22,7 +22,7 @@ opciones = {
     "metodo_de_cruza": "cruce_un_punto",
     "kwargs_cruza": {},
     "metodo_de_seleccion": "random",
-    "kwargs_seleccion": {"K": 5, "T":10, "dT":0.001},
+    "kwargs_seleccion": {"K": 5, "T":10, "dT":0.001, "num_ind_torneo": 5, "threshold_torneo": 0.5},
 }
 
 

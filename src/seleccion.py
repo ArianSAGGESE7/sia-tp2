@@ -80,6 +80,21 @@ def _boltzmann(poblacion, K, T, dT, gen, **kwargs):
     return seleccion
 
 
+def _torneo_deterministico(poblacion, num_ind_torneo, **kwargs):
+    torneo = random.choices(poblacion, k=num_ind_torneo)
+    torneo.sort(key=lambda ind: ind.costo)
+    return torneo[0]
+
+
+def _torneo_probabilistico(poblacion, num_ind_torneo, threshold_torneo, **kwargs):
+    torneo = random.choices(poblacion, k=num_ind_torneo)
+    r = np.random.uniform()
+    if r < threshold_torneo:
+        return min(torneo, key=lambda ind: ind.costo)
+    else:
+        return max(torneo, key=lambda ind: ind.costo)
+
+
 funcion_seleccion = {
     "random": _random,
     "elite": _elite,
@@ -87,8 +102,8 @@ funcion_seleccion = {
     "universal": _universal,
     "ranking": _ranking,
     "boltzmann": _boltzmann,
-    # "torneo_deterministico": _torneo_deterministico,
-    # "torneo_probabilistico": _torneo_probabilistico,
+    "torneo_deterministico": _torneo_deterministico,
+    "torneo_probabilistico": _torneo_probabilistico,
 }   
 
 
