@@ -16,8 +16,8 @@ opciones = {
     "cant_mutacion": 0.1,
     "metodo_de_cruza": "cruce_uniforme",
     "kwargs_cruza": {},
-    "metodo_de_seleccion": "ranking",
-    "kwargs_seleccion": {"K": 3},
+    "metodo_de_seleccion": "boltzmann",
+    "kwargs_seleccion": {"K": 5, "T":1, "dT":0.1},
 }
 
 

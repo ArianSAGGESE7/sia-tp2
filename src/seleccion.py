@@ -64,6 +64,21 @@ def _ranking(poblacion, K, **kwargs):
     return seleccion
 
 
+def _boltzmann(poblacion, K, T, dT, gen, **kwargs):
+    cT = T * (1 - dT)**gen
+    costo_max = poblacion[-1].costo
+    pseudo_costo = np.array([np.exp(ind.costo / (cT * costo_max)) for ind in poblacion])       
+    costo_acumulado = np.cumsum(pseudo_costo) / sum(pseudo_costo)
+    
+    print(cT)
+    seleccion = []
+    numeros = np.random.uniform(size=K)
+    for numero in numeros:
+        index = sum(numero > costo_acumulado)
+        seleccion.append(poblacion[index])
+
+    return seleccion
+
 
 funcion_seleccion = {
     "random": _random,
@@ -71,7 +86,7 @@ funcion_seleccion = {
     "ruleta": _ruleta,
     "universal": _universal,
     "ranking": _ranking,
-    # "boltzmann": _boltzmann,
+    "boltzmann": _boltzmann,
     # "torneo_deterministico": _torneo_deterministico,
     # "torneo_probabilistico": _torneo_probabilistico,
 }   

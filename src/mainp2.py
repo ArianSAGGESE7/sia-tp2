@@ -22,7 +22,7 @@ opciones = {
     "metodo_de_cruza": "cruce_un_punto",
     "kwargs_cruza": {},
     "metodo_de_seleccion": "random",
-    "kwargs_seleccion": {"K": 5},
+    "kwargs_seleccion": {"K": 5, "T":10, "dT":0.001},
 }
 
 
@@ -72,6 +72,8 @@ def genetic_algorithm(ref_img, opciones=opciones):
         # obtengo la siguiente generacion
         t2 = time()
         nueva_poblacion = poblacion[:num_seleccion_elite]
+        
+        kwargs_seleccion.update(gen=gen)
         posibles_padres = seleccionar(poblacion, metodo_de_seleccion, **kwargs_seleccion)
         
         while len(nueva_poblacion) < len(poblacion):
