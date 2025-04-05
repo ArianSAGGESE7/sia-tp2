@@ -8,5 +8,5 @@ clean:
 	@echo "Cleaning up..."	
 	@rm -rf */__pycache__/
 	@rm -rf */*.pyc
-	@rm *.png
-	@rm *.jpg
+	@rm -f *.png
+	@rm -f *.jpg
