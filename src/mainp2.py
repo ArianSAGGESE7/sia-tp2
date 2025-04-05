@@ -83,6 +83,6 @@ def genetic_algorithm(ref_img, opciones=opciones):
         
         if gen % 10 == 0:
             img = crear_imagen(mejor)
-            cv2.imwrite("out-{}.png".format(gen), img)
+            cv2.imwrite("out-{}.jpg".format(gen), img)
 
     return mejor
