@@ -19,7 +19,10 @@ opciones = {
     "num_seleccion_elite": 15,
     "prob_mutacion": 0.1,
     "cant_mutacion": 0.1,
-    "metodo_de_cruza": "cruce_un_punto"
+    "metodo_de_cruza": "cruce_un_punto",
+    "kwargs_cruza": {},
+    "metodo_de_seleccion": "random",
+    "kwargs_seleccion": {"K": 5},
 }
 
 
@@ -33,7 +36,11 @@ def genetic_algorithm(ref_img, opciones=opciones):
     prob_mutacion       = opciones["prob_mutacion"]
     cant_mutacion       = opciones["cant_mutacion"]
     metodo_de_cruza     = opciones["metodo_de_cruza"]
-       
+    kwargs_cruza        = opciones["kwargs_cruza"]
+    metodo_de_seleccion = opciones["metodo_de_seleccion"]
+    kwargs_seleccion    = opciones["kwargs_seleccion"]
+
+
     poblacion = generar_poblacion(ref_img, num_individuos, num_poligonos)
     print("gen", "costo", "t.cost", "t.img", "t.eval", "t.cruzar", sep="\t")
     
@@ -65,9 +72,11 @@ def genetic_algorithm(ref_img, opciones=opciones):
         # obtengo la siguiente generacion
         t2 = time()
         nueva_poblacion = poblacion[:num_seleccion_elite]
+        posibles_padres = seleccionar(poblacion, metodo_de_seleccion, **kwargs_seleccion)
+        
         while len(nueva_poblacion) < len(poblacion):
-            p1, p2 = seleccionar(poblacion)
-            hijo = cruzar(p1, p2, metodo=metodo_de_cruza)
+            p1, p2 = np.random.choice(posibles_padres, 2)
+            hijo = cruzar(p1, p2, metodo_de_cruza, **kwargs_cruza)
             hijo = mutar(hijo, prob_mutacion, cant_mutacion)
             nueva_poblacion.append(hijo)
         poblacion = nueva_poblacion
