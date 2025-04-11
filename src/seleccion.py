@@ -70,7 +70,6 @@ def _boltzmann(poblacion, K, T, dT, gen, **kwargs):
     pseudo_costo = np.array([np.exp(ind.costo / (cT * costo_max)) for ind in poblacion])       
     costo_acumulado = np.cumsum(pseudo_costo) / sum(pseudo_costo)
     
-    print(cT)
     seleccion = []
     numeros = np.random.uniform(size=K)
     for numero in numeros:
