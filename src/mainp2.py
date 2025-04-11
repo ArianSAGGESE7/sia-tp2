@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from multiprocessing import Pool
-from joblib import Parallel, delayed
 import numpy as np
 import cv2
 from time import time

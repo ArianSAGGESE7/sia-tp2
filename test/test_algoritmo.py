@@ -2,7 +2,7 @@ import cv2
 from src.mainp2 import genetic_algorithm
 from src.individuo import crear_imagen, crear_individuo
 
-img = cv2.imread("test/image_00.png")
+img = cv2.imread("Images/image_00.png")
 img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
 img = cv2.resize(img, (100, 100)) 
 
