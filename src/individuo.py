@@ -40,9 +40,9 @@ def crear_individuo(img, num_poligonos, num_lados):
     return ind
 
 
-def generar_poblacion(img, num_individuos, num_poligonos):
+def generar_poblacion(img, num_individuos, num_poligonos, num_lados):
     "Genera una población de M individuos con N triángulos cada uno"
-    return [crear_individuo(img, num_poligonos, 3) for _ in range(num_individuos)]    
+    return [crear_individuo(img, num_poligonos, num_lados) for _ in range(num_individuos)]    
 
 
 def crear_imagen(individuo: Individuo):

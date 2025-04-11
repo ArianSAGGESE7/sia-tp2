@@ -2,7 +2,7 @@
 
 test:
 	@echo "Running tests..."
-	@python -m pytest test
+	@python3 -m pytest test
 	
 clean:
 	@echo "Cleaning up..."	
