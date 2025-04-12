@@ -1,4 +1,4 @@
-# Trabajo Práctico 2: Algortitmos Generticos
+# Trabajo Práctico 2: Algortitmos Geneticos
 
 Este repositorio contiene el código fuente y la documentación del segundo trabajo práctico de la asignatura Sistemas Inteligentes Aplicados. El objetivo principal es implementar y analizar diferentes variaciones de algoritmos geneticos para representar imagenes.
 
