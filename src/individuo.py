@@ -52,6 +52,8 @@ def crear_imagen(individuo: Individuo):
     poligonos = individuo.cromosoma[:,:-4].reshape(shape)
     
     img = np.zeros(individuo.img_dims)                      # Lienzo vacio
+    img[:, :, 3] = 255                                      # Deja todo en negro opaco
+        
     for i in range(poligonos.shape[0]):                     # Armo matriz con triangulos dentro
         poligono = poligonos[i]
         color = colores[i].tolist()

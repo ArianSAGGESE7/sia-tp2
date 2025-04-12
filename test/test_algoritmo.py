@@ -24,6 +24,7 @@ def test_00():
             },
         "seleccion": {
             "num_seleccion_elite": 3,
+            "num_nuevos_individuos": 5,
             "metodo": "random",
             "K": 5,
             "T": 1,
@@ -58,6 +59,7 @@ def test_01():
             },
         "seleccion": {
             "num_seleccion_elite": 3,
+            "num_nuevos_individuos": 5,
             "metodo": "random",
             "K": 5,
             "T": 1,

@@ -17,7 +17,7 @@ opciones = {
     "num_generaciones": 100,
     "mutacion": {"prob_mutacion": 0.1, "cant_mutacion": 0.1,},
     "cruza": {"metodo": "cruce_un_punto"},
-    "seleccion": {"num_seleccion_elite": 15, "metodo": "random", "K": 5, "T":10, "dT":0.001, "num_ind_torneo": 5, "threshold_torneo": 0.5},
+    "seleccion": {"num_seleccion_elite": 15, "num_nuevos_individuos": 5, "metodo": "random", "K": 5, "T":10, "dT":0.001, "num_ind_torneo": 5, "threshold_torneo": 0.5},
     "paso_para_resultados_detallados": 5
 }
 
@@ -33,9 +33,12 @@ def genetic_algorithm(ref_img, opciones=opciones):
     num_seleccion_elite = opciones["seleccion"]["num_seleccion_elite"]
     kwargs_seleccion    = opciones["seleccion"]
 
-
+    # incializo
     poblacion = generar_poblacion(ref_img, num_individuos, num_poligonos, num_lados)
-    
+    for ind in poblacion:
+        img = crear_imagen(ind)
+        ind.costo = calcular_costo(img, ref_img)
+
     results = {
         "mejor_fitness_por_generacion": [],
         "peor_fitness_por_generacion": [],
@@ -49,9 +52,9 @@ def genetic_algorithm(ref_img, opciones=opciones):
         # evaluo el fitness de cada uno
         # TODO Esto se podria paralelizar para mayor rapidez
         t0 = time()
-        for ind in poblacion:
-            img = crear_imagen(ind)
-            ind.costo = calcular_costo(img, ref_img)
+        # for ind in poblacion:
+        #     img = crear_imagen(ind)
+        #     ind.costo = calcular_costo(img, ref_img)
             
 
         # ordeno en funcion de costo
@@ -63,14 +66,24 @@ def genetic_algorithm(ref_img, opciones=opciones):
         # obtengo la siguiente generacion
         t2 = time()
         nueva_poblacion = poblacion[:num_seleccion_elite]
-        kwargs_seleccion.update(gen=gen)
-        posibles_padres = seleccionar(poblacion, **kwargs_seleccion)
-        
+        kwargs_seleccion.update(gen=gen) # para calculo de temperatura
+
+        # Los posibles padres son una mezcla de los mejores,
+        # los mejores seleccionados
+        # y de nuevos individuos.
+        posibles_padres = poblacion[:num_seleccion_elite]
+        posibles_padres += seleccionar(poblacion, **kwargs_seleccion)
+        posibles_padres += generar_poblacion(ref_img, kwargs_seleccion["num_nuevos_individuos"], num_poligonos, num_lados)
+
         while len(nueva_poblacion) < len(poblacion):
             p1, p2 = np.random.choice(posibles_padres, 2)
             hijo = cruzar(p1, p2, **kwargs_cruza)
             hijo = mutar(hijo, **kwargs_mutacion)
+
+            img = crear_imagen(hijo)
+            hijo.costo = calcular_costo(img, ref_img)
             nueva_poblacion.append(hijo)
+        
         poblacion = nueva_poblacion
         
 
@@ -84,7 +97,7 @@ def genetic_algorithm(ref_img, opciones=opciones):
         results["peor_fitness_por_generacion"].append(poblacion[-1].costo)
         results["mejor"] = mejor
            
-        if gen % opciones["paso_para_resultados_detallados"]:
+        if gen % opciones["paso_para_resultados_detallados"] == 0:
             results["mejor_individuo_por_generacion"].append((gen, mejor))
             
     return results
