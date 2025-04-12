@@ -3,7 +3,7 @@ from copy import copy
 from src.individuo import crear_individuo, crear_imagen, calcular_costo
 
 
-img = cv2.imread("test/image_00.png")
+img = cv2.imread("Images/image_00.png")
 img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
 
 def test_individuo():

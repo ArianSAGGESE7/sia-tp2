@@ -40,9 +40,9 @@ def crear_individuo(img, num_poligonos, num_lados):
     return ind
 
 
-def generar_poblacion(img, num_individuos, num_poligonos):
+def generar_poblacion(img, num_individuos, num_poligonos, num_lados):
     "Genera una población de M individuos con N triángulos cada uno"
-    return [crear_individuo(img, num_poligonos, 3) for _ in range(num_individuos)]    
+    return [crear_individuo(img, num_poligonos, num_lados) for _ in range(num_individuos)]    
 
 
 def crear_imagen(individuo: Individuo):
@@ -52,6 +52,8 @@ def crear_imagen(individuo: Individuo):
     poligonos = individuo.cromosoma[:,:-4].reshape(shape)
     
     img = np.zeros(individuo.img_dims)                      # Lienzo vacio
+    img[:, :, 3] = 255                                      # Deja todo en negro opaco
+        
     for i in range(poligonos.shape[0]):                     # Armo matriz con triangulos dentro
         poligono = poligonos[i]
         color = colores[i].tolist()

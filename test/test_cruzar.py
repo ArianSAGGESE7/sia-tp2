@@ -4,7 +4,7 @@ import numpy as np
 from src.individuo import crear_individuo
 from src.cruzar import cruzar
 
-img = cv2.imread("test/image_00.png")
+img = cv2.imread("Images/image_00.png")
 img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
 
 
