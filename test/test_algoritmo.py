@@ -16,22 +16,23 @@ def test_00():
         "num_individuos": 100,
         "num_generaciones": 200,
         "mutacion": {
-            "prob_mutacion": 0.1,
+            "prob_mutacion": 0.9,
             "cant_mutacion": 0.1
             },
         "cruza": {
-            "metodo": "cruce_un_punto"
+            "metodo": "cruce_uniforme"
             },
         "seleccion": {
             "num_seleccion_elite": 3,
             "num_nuevos_individuos": 5,
-            "metodo": "random",
-            "K": 5,
+            "metodo": "torneo_deterministico",
+            "K": 35,
             "T": 1,
             "dT": 0.1,
             "num_ind_torneo": 5,
             "threshold_torneo": 0.5},
-        "paso_para_resultados_detallados": 5
+        "paso_para_resultados_detallados": 2,
+        "verbose": True
     }
 
     metricas = genetic_algorithm(img, opciones)
