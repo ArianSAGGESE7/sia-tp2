@@ -71,6 +71,7 @@ def crear_imagen(individuo: Individuo):
     
     img = np.zeros(individuo.img_dims)
     img = Image.fromarray(img, mode="RGBA")
+    #img = Image.new("RGBA", (individuo.img_dims[:2]), (255, 255, 255, 255)) # lienzo blanco
     for i, poligono in enumerate(poligonos):
         pimg = np.zeros(individuo.img_dims)
         pimg = Image.fromarray(pimg, mode="RGBA")
