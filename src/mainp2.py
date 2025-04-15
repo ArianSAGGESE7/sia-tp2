@@ -32,6 +32,7 @@ def genetic_algorithm(ref_img, opciones=opciones):
     kwargs_cruza        = opciones["cruza"]
     num_seleccion_elite = opciones["seleccion"]["num_seleccion_elite"]
     kwargs_seleccion    = opciones["seleccion"]
+    verbose             = opciones.get("verbose", False)
 
     # incializo
     poblacion = generar_poblacion(ref_img, num_individuos, num_poligonos, num_lados)
@@ -46,6 +47,11 @@ def genetic_algorithm(ref_img, opciones=opciones):
         "mejor_individuo_por_generacion": []
     }
     
+    tiempo_total = 0
+
+    n_stuck = 0
+    mejora = True
+
     for gen in range(num_generaciones):
         tiempo = {"total": 0, "evaluacion": 0, "cruza": 0}
         
@@ -60,44 +66,73 @@ def genetic_algorithm(ref_img, opciones=opciones):
         # ordeno en funcion de costo
         t1 = time()
         poblacion.sort(key=lambda ind: ind.costo)
+        
         mejor = poblacion[0]
-
+        peor = poblacion[-1]
 
         # obtengo la siguiente generacion
         t2 = time()
         nueva_poblacion = poblacion[:num_seleccion_elite]
-        kwargs_seleccion.update(gen=gen) # para calculo de temperatura
-
+        
         # Los posibles padres son una mezcla de los mejores,
         # los mejores seleccionados
         # y de nuevos individuos.
+        kwargs_seleccion.update(gen=gen) # para calculo de temperatura
         posibles_padres = poblacion[:num_seleccion_elite]
         posibles_padres += seleccionar(poblacion, **kwargs_seleccion)
-        posibles_padres += generar_poblacion(ref_img, kwargs_seleccion["num_nuevos_individuos"], num_poligonos, num_lados)
+        
+        if gen != 0 and results.get("mejor_fitness_por_generacion")[-1] == mejor.costo:
+            n_stuck += 1
+        else:
+            n_stuck = 0
 
-        while len(nueva_poblacion) < len(poblacion):
+        if n_stuck == 10:
+            posibles_padres = poblacion[:len(poblacion) // 2]
+            num_nuevos_individuos = len(poblacion) // 2
+            prob_mutacion = 1.0
+            cant_mutacion = 1.0
+            n_stuck = 0
+        else:
+            num_nuevos_individuos = kwargs_seleccion["num_nuevos_individuos"]
+            prob_mutacion = kwargs_mutacion["prob_mutacion"]
+            cant_mutacion = kwargs_mutacion["cant_mutacion"]
+        
+        nuevos_individuos = generar_poblacion(ref_img, num_nuevos_individuos, num_poligonos, num_lados)
+        for ind in nuevos_individuos:
+            img = crear_imagen(ind)
+            ind.costo = calcular_costo(img, ref_img)
+        posibles_padres += nuevos_individuos
+
+        while len(nueva_poblacion) < len(poblacion):        
             p1, p2 = np.random.choice(posibles_padres, 2)
             hijo = cruzar(p1, p2, **kwargs_cruza)
-            hijo = mutar(hijo, **kwargs_mutacion)
+            hijo = mutar(hijo, prob_mutacion, cant_mutacion)
 
             img = crear_imagen(hijo)
             hijo.costo = calcular_costo(img, ref_img)
-            nueva_poblacion.append(hijo)
-        
-        poblacion = nueva_poblacion
-        
+            nueva_poblacion.append(hijo)#min(hijo, p1, p2, key=lambda x: x.costo))
+
 
         # Calculo metricas
         t3 = time()
+        tiempo_total += t3-t0
         tiempo["total"] = t3-t0
         tiempo["cruza"] = t3-t2
         tiempo["evaluacion"] = t1-t0
         results["tiempo_por_generacion"].append(tiempo)
-        results["mejor_fitness_por_generacion"].append(poblacion[0].costo)
-        results["peor_fitness_por_generacion"].append(poblacion[-1].costo)
+        results["mejor_fitness_por_generacion"].append(mejor.costo)
+        results["peor_fitness_por_generacion"].append(peor.costo)
         results["mejor"] = mejor
            
         if gen % opciones["paso_para_resultados_detallados"] == 0:
             results["mejor_individuo_por_generacion"].append((gen, mejor))
+            img = crear_imagen(mejor)
+            cv2.imwrite("gen_{}.jpg".format(gen), img)
             
+        if verbose:
+            print("{}\t{:.4f}\t{:.4f}\t\t{:.2f}\t{:.2f}".format(gen, mejor.costo, peor.costo, tiempo["total"], tiempo_total))
+
+        # Actualizo la nueva poblacion
+        poblacion = nueva_poblacion
+
     return results
