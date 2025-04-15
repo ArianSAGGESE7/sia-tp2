@@ -1,6 +1,7 @@
-import cv2
+import cv2	import cv2
 from src.mainp2 import genetic_algorithm
 from src.individuo import crear_imagen, crear_individuo
+
 
 
 def test_00():
