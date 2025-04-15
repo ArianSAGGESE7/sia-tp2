@@ -1,6 +1,4 @@
-import cv2
-from src.mainp2 import genetic_algorithm
-from src.individuo import crear_imagen, crear_individuo
+
 
 
 def test_00():
@@ -76,3 +74,4 @@ def test_01():
     img = crear_imagen(mejor)
     # cv2.imwrite("out.jpg", img)
     assert isinstance(metricas, dict)
+
